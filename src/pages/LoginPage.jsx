@@ -4,11 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { LogoIcon } from '../components/Icons';
 import '../styles/Auth.css';
 
-// Returns the home route for a given role
 function roleHomeRoute(role) {
     if (role === 'admin') return '/analytics';
     if (role === 'hr') return '/upload';
-    return '/chat'; // employee default
+    return '/chat'; 
 }
 
 export default function LoginPage() {
