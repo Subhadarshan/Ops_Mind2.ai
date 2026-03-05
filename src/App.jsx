@@ -28,6 +28,7 @@ function AppRoutes() {
 
   return (
     <Routes>
+      
       <Route path="/" element={user ? <Navigate to={roleHome(user)} replace /> : <LandingPage />} />
       <Route path="/login" element={user ? <Navigate to={roleHome(user)} replace /> : <LoginPage />} />
       <Route path="/signup" element={user ? <Navigate to={roleHome(user)} replace /> : <SignupPage />} />
