@@ -31,7 +31,6 @@ export default function SignupPage() {
             setError(result.message);
             setLoading(false);
         } else {
-            // Account created — redirect to login with success flag
             navigate('/login?registered=true');
         }
     }
@@ -73,7 +72,7 @@ export default function SignupPage() {
                         </div>
                         <div className="form-group">
                             <label className="form-label" htmlFor="signup-email">Email address</label>
-                            <input id="signup-email" className="form-input" type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} />
+                            <input id="signup-email" className="form-input" type="email" placeholder="your@company.com" value={email} onChange={e => setEmail(e.target.value)} />
                         </div>
                         <div className="form-group">
                             <label className="form-label" htmlFor="signup-password">Password</label>
@@ -93,7 +92,7 @@ export default function SignupPage() {
                             {loading ? 'Creating account…' : 'Create Account'}
                         </button>
                     </form>
-
+                    
                     <p className="auth-footer">
                         Already have an account? <Link to="/login">Sign in</Link>
                     </p>
