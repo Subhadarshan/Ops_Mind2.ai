@@ -1,0 +1,281 @@
+/* ══════════════════════════════════
+   LANDING PAGE — Neon Enterprise
+   ══════════════════════════════════ */
+
+.landing-page {
+    min-height: 100vh;
+    background: var(--navy-950);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Neon Glow Backgrounds ── */
+.landing-page::before,
+.landing-page::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.landing-page::before {
+    width: 600px;
+    height: 600px;
+    background: rgba(99, 102, 241, 0.15);
+    /* Indigo glow */
+    top: -150px;
+    right: -100px;
+}
+
+.landing-page::after {
+    width: 500px;
+    height: 500px;
+    background: rgba(34, 197, 94, 0.08);
+    /* Green subtle glow */
+    bottom: -200px;
+    left: -150px;
+}
+
+/* ── Navbar ── */
+.landing-nav {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(10, 14, 26, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.landing-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.landing-logo-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.landing-logo-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--indigo-500), #22d3ee);
+    /* Cyan/Indigo neon */
+    padding: 2px 8px;
+    border-radius: 6px;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+}
+
+.landing-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-login {
+    color: var(--gray-300);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s, background 0.2s;
+}
+
+.btn-login:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-signup {
+    position: relative;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 24px;
+    background: var(--navy-900);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 1;
+}
+
+/* Neon border effect on Sign up */
+.btn-signup::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, var(--indigo-500), #22d3ee, var(--indigo-500));
+    z-index: -2;
+    border-radius: 30px;
+    padding: 2px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: bgSpin 3s linear infinite;
+    background-size: 200% auto;
+}
+
+.btn-signup:hover {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-1px);
+}
+
+@keyframes bgSpin {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+/* ── Hero Section ── */
+.landing-hero {
+    position: relative;
+    z-index: 10;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px;
+}
+
+.hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    color: var(--indigo-300);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 32px;
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.1);
+}
+
+.hero-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22d3ee;
+    box-shadow: 0 0 8px #22d3ee;
+}
+
+.hero-title {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    max-width: 800px;
+}
+
+.neon-text {
+    background: linear-gradient(to right, #fff, var(--indigo-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    position: relative;
+}
+
+.neon-text::after {
+    content: 'Knowledge';
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: linear-gradient(to right, #fff, var(--indigo-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: blur(16px);
+    opacity: 0.6;
+    z-index: -1;
+}
+
+.hero-subtitle {
+    font-size: 20px;
+    color: var(--gray-400);
+    max-width: 600px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+}
+
+.hero-cta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-primary {
+    padding: 16px 36px;
+    border-radius: 30px;
+    background: var(--indigo-500);
+    background: linear-gradient(135deg, var(--indigo-600), var(--indigo-400));
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 42px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
+
+    .landing-nav {
+        padding: 20px 24px;
+    }
+
+    .hero-cta {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .hero-cta a {
+        width: 100%;
+        text-align: center;
+    }
+}
