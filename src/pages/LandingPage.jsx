@@ -5,7 +5,7 @@ import '../styles/Landing.css';
 export default function LandingPage() {
     return (
         <div className="landing-page">
-            {/* ── Navbar ── */}
+
             <nav className="landing-nav">
                 <Link to="/" className="landing-brand">
                     <LogoIcon size={32} />
@@ -19,7 +19,7 @@ export default function LandingPage() {
                 </div>
             </nav>
 
-            {/* ── Hero Section ── */}
+         
             <main className="landing-hero">
                 <div className="hero-pill">
                     <span className="hero-pill-dot" />
@@ -27,7 +27,7 @@ export default function LandingPage() {
                 </div>
 
                 <h1 className="hero-title">
-                    Enterprise <span className="neon-text">Knowledge</span>, <br /> Illuminated.
+                    Enterprise <span className="neon-text">Knowledge</span>, <br />Illuminated.
                 </h1>
 
                 <p className="hero-subtitle">
@@ -35,7 +35,7 @@ export default function LandingPage() {
                 </p>
 
                 <div className="hero-cta">
-                    <Link to="/signup" className="btn-primary">Get Started</Link>
+                     <Link to="/signup" className="btn-primary">Get Started</Link>
                     <Link to="/login" className="btn-login" style={{ fontSize: 16 }}>View Demo</Link>
                 </div>
             </main>
