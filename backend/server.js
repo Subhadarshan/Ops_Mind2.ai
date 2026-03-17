@@ -8,6 +8,8 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
 const leaveRoutes = require('./routes/leaveRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const documentRoutes = require('./routes/documentRoutes');
 
 // ── Initialize Express ──
 const app = express();
@@ -30,6 +32,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/leave', leaveRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/documents', documentRoutes);
 
 // ── 404 handler ──
 app.use((req, res) => {
@@ -51,7 +55,9 @@ connectDB().then(() => {
         console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
         console.log(`🔑 Auth API:     http://localhost:${PORT}/api/auth`);
         console.log(`📋 Leave API:    http://localhost:${PORT}/api/leave`);
-        console.log(`👑 Admin API:    http://localhost:${PORT}/api/admin\n`);
+        console.log(`👑 Admin API:    http://localhost:${PORT}/api/admin`);
+        console.log(`🤖 Chat API:     http://localhost:${PORT}/api/chat`);
+        console.log(`📄 Docs API:     http://localhost:${PORT}/api/documents\n`);
     });
 });
 

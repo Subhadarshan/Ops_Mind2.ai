@@ -3,85 +3,91 @@ import { useAuth } from '../context/AuthContext';
 import { SendIcon, AIStarIcon } from '../components/Icons';
 import '../styles/Chat.css';
 
-// ── Knowledge base ──
-const knowledgeBase = [
-    {
-        keywords: ['remote work', 'work from home', 'wfh', 'remote'],
-        answer: 'Our remote work policy allows eligible employees to work from home up to 3 days per week. Employees must maintain core hours between 10:00 AM and 3:00 PM and ensure a stable internet connection. Manager approval is required for fully remote arrangements exceeding 2 consecutive weeks.',
-        source: 'HR_Remote_Work_Policy_2025.pdf',
-        page: 4
-    },
-    {
-        keywords: ['annual leave', 'leave', 'vacation', 'pto', 'paid time off', 'time off'],
-        answer: 'To request annual leave, navigate to the HR Self-Service Portal > Time Off > New Request. Submit your request at least 5 business days in advance. Annual leave accrues at 1.67 days per month (20 days/year) for employees with less than 5 years of tenure, and 2.08 days per month (25 days/year) for 5+ years.',
-        source: 'Employee_Benefits_Handbook.pdf',
-        page: 12
-    },
-    {
-        keywords: ['onboarding', 'checklist', 'new hire', 'new employee', 'orientation'],
-        answer: 'The onboarding checklist includes: (1) Complete I-9 and W-4 forms by Day 1, (2) Attend IT orientation for equipment setup on Day 1, (3) Complete compliance training modules by end of Week 1, (4) Meet with assigned buddy and direct manager, (5) Review department-specific SOPs by end of Week 2, and (6) Submit 30-day check-in feedback form.',
-        source: 'Onboarding_Checklist_2025.pdf',
-        page: 1
-    },
-    {
-        keywords: ['expense', 'reimbursement', 'travel'],
-        answer: 'Expense reports must be submitted within 30 days of the expense date through Concur. Receipts are required for all expenses over $25. Domestic travel per-diem rates follow GSA guidelines. International travel requires pre-approval from VP-level and above. Reimbursement processing takes 5–7 business days after manager approval.',
-        source: 'Travel_Expense_Policy.pdf',
-        page: 7
-    },
-    {
-        keywords: ['performance review', 'review', 'performance', 'evaluation'],
-        answer: 'Performance reviews are conducted bi-annually in June and December. Self-assessments must be completed by the 15th of the review month. Managers submit final evaluations by the 25th. Ratings follow a 5-point scale: Exceeds Expectations, Meets Expectations, Developing, Below Expectations, and Unsatisfactory.',
-        source: 'Performance_Management_Guide.pdf',
-        page: 9
-    },
-    {
-        keywords: ['security', 'password', 'it security', 'cyber'],
-        answer: 'All employees must use multi-factor authentication (MFA) for accessing company systems. Passwords must be at least 12 characters with a mix of uppercase, lowercase, numbers, and symbols. Password rotation is required every 90 days. Report suspicious emails to security@company.com immediately.',
-        source: 'IT_Security_Procedures_Q1.pdf',
-        page: 3
-    }
-];
-
-function findAnswer(question) {
-    const q = question.toLowerCase();
-    for (const item of knowledgeBase) {
-        if (item.keywords.some(kw => q.includes(kw))) return item;
-    }
-    return null;
-}
-
 function getInitials(name) {
+    if (!name) return '??';
     return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
+// Simple markdown-ish renderer: bold **text**, bullet lists, newlines
+function renderAIText(text) {
+    if (!text) return null;
+    const lines = text.split('\n');
+    return lines.map((line, i) => {
+        // Render **bold**
+        const parts = line.split(/(\*\*[^*]+\*\*)/g).map((part, j) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={j}>{part.slice(2, -2)}</strong>;
+            }
+            return part;
+        });
+        return <span key={i}>{parts}<br /></span>;
+    });
+}
+
 export default function ChatPage() {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [docCount, setDocCount] = useState(0);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
+
+    // Fetch role-based suggestions
+    useEffect(() => {
+        if (!token) return;
+        fetch('/api/chat/suggestions', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => res.json())
+            .then(data => { if (data.success) setSuggestions(data.data); })
+            .catch(err => console.error('Could not fetch suggestions', err));
+    }, [token]);
+
+    // Fetch document count so we can show KB badge
+    useEffect(() => {
+        if (!token) return;
+        fetch('/api/documents/count', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => res.json())
+            .then(data => { if (data.success) setDocCount(data.count); })
+            .catch(() => { /* ignore silently */ });
+    }, [token]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    function sendMessage(text) {
+    async function sendMessage(text) {
         if (!text.trim()) return;
         const userMsg = { role: 'user', text: text.trim() };
         setMessages(prev => [...prev, userMsg]);
         setInput('');
         setIsTyping(true);
 
-        setTimeout(() => {
-            const result = findAnswer(text);
-            const aiMsg = result
-                ? { role: 'ai', text: result.answer, source: result.source, page: result.page }
-                : { role: 'ai', text: "I don't know based on available documents.", notFound: true };
-            setMessages(prev => [...prev, aiMsg]);
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ message: text.trim() })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                setMessages(prev => [...prev, { role: 'ai', text: data.data.reply }]);
+            } else {
+                setMessages(prev => [...prev, { role: 'ai', text: `Error: ${data.message}`, notFound: true }]);
+            }
+        } catch (error) {
+            setMessages(prev => [...prev, { role: 'ai', text: 'Network error. Is the server running?', notFound: true }]);
+        } finally {
             setIsTyping(false);
-        }, 1000 + Math.random() * 600);
+        }
     }
 
     function handleKeyDown(e) {
@@ -91,28 +97,21 @@ export default function ChatPage() {
         }
     }
 
-    function handleDownload(source) {
-        // Create a dummy PDF blob to simulate download
-        const blob = new Blob(['Simulated PDF content for ' + source], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = source;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-    const initials = getInitials(user.name);
+    const initials = getInitials(user?.name);
 
     return (
         <div className="chat-page">
             <header className="chat-page-header">
                 <div>
                     <h1 className="chat-page-title">Chat Assistant</h1>
-                    <p className="chat-page-subtitle">Ask questions about your internal documents</p>
+                    <p className="chat-page-subtitle">Ask questions about your internal documents and get AI-powered answers</p>
                 </div>
+                {docCount > 0 && (
+                    <div className="kb-badge" title="Documents loaded from knowledge base">
+                        <span className="kb-badge-dot" />
+                        📄 {docCount} document{docCount !== 1 ? 's' : ''} in knowledge base
+                    </div>
+                )}
             </header>
 
             <div className="chat-messages">
@@ -127,11 +126,22 @@ export default function ChatPage() {
                             </svg>
                         </div>
                         <h2 className="welcome-title">Welcome to OpsMind AI</h2>
-                        <p className="welcome-desc">I can help you find answers from your organization's internal documents, policies, and procedures.</p>
+                        <p className="welcome-desc">
+                            I am your specialized assistant, ready to help individuals in the <b>{user?.role}</b> role with guidance, policies, and productivity.
+                            {docCount > 0 && (
+                                <span className="welcome-doc-hint">
+                                    {' '}I also have access to <strong>{docCount} company document{docCount !== 1 ? 's' : ''}</strong> — ask me anything from them!
+                                </span>
+                            )}
+                        </p>
                         <div className="quick-prompts">
-                            <button className="quick-prompt" onClick={() => sendMessage('What is our remote work policy?')}>What is our remote work policy?</button>
-                            <button className="quick-prompt" onClick={() => sendMessage('How do I request annual leave?')}>How do I request annual leave?</button>
-                            <button className="quick-prompt" onClick={() => sendMessage('Summarize onboarding checklist')}>Summarize onboarding checklist</button>
+                            {(suggestions.length > 0 ? suggestions.slice(0, 3) : [
+                                'What is our remote work policy?',
+                                'How do I request annual leave?',
+                                'What are the performance review criteria?'
+                            ]).map((suggest, idx) => (
+                                <button key={idx} className="quick-prompt" onClick={() => sendMessage(suggest)}>{suggest}</button>
+                            ))}
                         </div>
                     </div>
                 )}
@@ -142,45 +152,9 @@ export default function ChatPage() {
                             {msg.role === 'user' ? initials : <AIStarIcon />}
                         </div>
                         <div className="msg-body">
-                            <div className={`msg-bubble ${msg.notFound ? 'not-found' : ''}`}>{msg.text}</div>
-                            {msg.source && (
-                                <div className="citation-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                            <polyline points="14 2 14 8 20 8" />
-                                        </svg>
-                                        <span className="citation-file">{msg.source}</span>
-                                        <span className="citation-page">· Page {msg.page}</span>
-                                    </div>
-                                    <button
-                                        onClick={() => handleDownload(msg.source)}
-                                        style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            color: 'var(--indigo-500)',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 4,
-                                            fontSize: 12,
-                                            fontWeight: 600,
-                                            padding: '4px 8px',
-                                            borderRadius: 4,
-                                        }}
-                                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.1)'}
-                                        onMouseOut={(e) => e.currentTarget.style.background = 'none'}
-                                        title="Download PDF"
-                                    >
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}>
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                            <polyline points="7 10 12 15 17 10" />
-                                            <line x1="12" y1="15" x2="12" y2="3" />
-                                        </svg>
-                                        Download
-                                    </button>
-                                </div>
-                            )}
+                            <div className={`msg-bubble ${msg.notFound ? 'not-found' : ''}`} style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
+                                {msg.role === 'ai' ? renderAIText(msg.text) : msg.text}
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -205,7 +179,7 @@ export default function ChatPage() {
                         ref={inputRef}
                         className="chat-input"
                         type="text"
-                        placeholder="Ask a question about internal documents…"
+                        placeholder={docCount > 0 ? `Ask about policies, documents, or anything…` : 'Ask a question…'}
                         value={input}
                         onChange={e => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
@@ -216,7 +190,11 @@ export default function ChatPage() {
                         <SendIcon />
                     </button>
                 </div>
-                <p className="input-hint">OpsMind AI may produce inaccurate information. Always verify critical data.</p>
+                <p className="input-hint">
+                    {docCount > 0
+                        ? `OpsMind AI searches ${docCount} indexed document${docCount !== 1 ? 's' : ''} to answer your questions. Always verify critical data.`
+                        : 'OpsMind AI may produce inaccurate information. Always verify critical data.'}
+                </p>
             </div>
         </div>
     );

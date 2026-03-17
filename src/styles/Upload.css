@@ -244,3 +244,112 @@
 .status-pill.processing .status-pill-dot {
     background: var(--amber-500);
 }
+
+/* ── Toast ── */
+.upload-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    animation: slideInToast 0.3s ease;
+    max-width: 380px;
+}
+
+.upload-toast--success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.upload-toast--error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+@keyframes slideInToast {
+    from {
+        transform: translateX(110%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ── Delete button ── */
+.delete-doc-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+    padding: 4px 6px;
+    border-radius: 6px;
+}
+
+.delete-doc-btn:hover {
+    opacity: 1;
+    background: #fff0f0;
+}
+
+.delete-doc-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+/* ── Loading / Empty states ── */
+.docs-loading,
+.docs-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: var(--gray-400);
+    font-size: 14px;
+    gap: 10px;
+}
+
+.docs-empty span {
+    font-size: 36px;
+}
+
+/* ── Progress label ── */
+.progress-label {
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 6px;
+}
+
+/* ── Table wrapper scrollable ── */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+/* ── Info banner ── */
+.upload-info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.07), rgba(129, 140, 248, 0.05));
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--navy-800);
+    line-height: 1.6;
+}
+
+.banner-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}

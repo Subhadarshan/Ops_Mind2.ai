@@ -311,3 +311,50 @@
     color: var(--gray-400);
     margin-top: 7px;
 }
+
+/* ── Knowledge Base badge (chat header) ── */
+.kb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(129, 140, 248, 0.07));
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    color: var(--indigo-600, #4f46e5);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 13px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.kb-badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+/* ── Welcome doc hint ── */
+.welcome-doc-hint {
+    display: block;
+    margin-top: 6px;
+    color: var(--indigo-600, #4f46e5);
+    font-size: 13px;
+}
